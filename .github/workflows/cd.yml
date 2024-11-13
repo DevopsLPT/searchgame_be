@@ -1,0 +1,42 @@
+name: Python application
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read 
+
+jobs:
+  build:
+    runs-on: game 
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4  
+      
+    - name: Check if Python is installed
+      run: |
+        if ! command -v python3 &> /dev/null
+        then
+          echo "Python is not installed, installing Python 3.10..."
+          sudo apt update
+          sudo apt install -y python3.10 python3.10-distutils python3.10-venv
+        else
+          echo "Python is already installed."
+        fi
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v3 
+      with:
+        python-version: "3.11"
+
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt --break-system-packages
+        
+    - name: deploy
+      run: pip app.py 
